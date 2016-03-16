@@ -32,7 +32,10 @@ def pypi(message):
 
 @bot.message_handler(commands=['pysearch'])
 def pysearch(message):
-    bot.reply_to(message,list_packages(message.text[10:]))
+    response = list_packages(message.text[10:])
+    splitted_text = util.split_string(response, 3000)
+    for text in splitted_text:
+        bot.reply_to(message,text)
 
 def list_packages(argument):
     count = 0
