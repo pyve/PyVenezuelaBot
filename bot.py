@@ -20,6 +20,10 @@ def send_welcome(message):
 def send_about(message):
     bot.reply_to(message, "Hola! Soy PyVeBot!\nSoy un bot para hacer mas simple la busqueda y enlace a paquetes del repositorio PyPi!\nFui creado por @DrBomb y tengo un repositorio con mi codigo fuente en https://github.com/DrBomb/PyVenezuelaBot")
 
+@bot.message_handler(commands=["help"])
+def send_help(message):
+    bot.reply_to(message,"/help para esta ayuda\n/pypi para link directo\n/pysearch para busqueda de paquete\n/about sobre este bot")
+
 @bot.message_handler(commands=['pypi'])
 def pypi(message):    
     bot.reply_to(message,locate_or_list(message.text[6:]))
