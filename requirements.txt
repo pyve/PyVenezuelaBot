@@ -1,3 +1,6 @@
+-f /usr/share/pip-wheels
+cssselect==0.9.1
+lxml==3.5.0
 py==1.4.31
 pyTelegramBotAPI==1.4.2
 pytest==2.9.0
