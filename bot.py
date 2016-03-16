@@ -25,7 +25,9 @@ def send_help(message):
     bot.reply_to(message,"/help para esta ayuda\n/pypi para link directo\n/pysearch para busqueda de paquete\n/about sobre este bot")
 
 @bot.message_handler(commands=['pypi'])
-def pypi(message):    
+def pypi(message):
+    if message.text is "/pypi":
+      return    
     bot.reply_to(message,locate_or_list(message.text[6:]))
 
 @bot.message_handler(commands=['pysearch'])
