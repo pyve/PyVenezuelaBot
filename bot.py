@@ -1,4 +1,4 @@
-import telebot
+import telebot, util
 from lxml.etree import fromstring
 from lxml.cssselect import CSSSelector
 import re
