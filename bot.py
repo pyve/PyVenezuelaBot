@@ -1,8 +1,10 @@
-import telebot, util
+import telebot, random
+from telebot import util
 from lxml.etree import fromstring
 from lxml.cssselect import CSSSelector
 import re
 
+MAX_PACKAGE_RETURN = 50
 pypi_base_url = "https://pypi.python.org/pypi/"
 bot = telebot.TeleBot("148844762:AAEYUrHETWR61EV7cysP6vssnZrhwETi4_8")
 f = open("simple.html")
@@ -26,12 +28,14 @@ def send_help(message):
 
 @bot.message_handler(commands=['pypi'])
 def pypi(message):
-    if message.text is "/pypi":
+    if message.text == "/pypi" or message.text == "/pypi ":
       return    
     bot.reply_to(message,locate_or_list(message.text[6:]))
 
 @bot.message_handler(commands=['pysearch'])
 def pysearch(message):
+    if message.text == "/pysearch" or message.text == "/pysearch ":
+        return
     response = list_packages(message.text[10:])
     splitted_text = util.split_string(response, 3000)
     for text in splitted_text:
@@ -47,6 +51,8 @@ def list_packages(argument):
             count+=1
     if count==0:
         return package_not_found(argument)
+    elif count > MAX_PACKAGE_RETURN:
+        return too_many_packages(argument,results,count)
     else:
         return package_list(argument,results,count)
 
@@ -62,6 +68,8 @@ def locate_or_list(argument):
             count+=1
     if count==0:
         return package_not_found(argument)
+    elif count > MAX_PACKAGE_RETURN:
+        return too_many_packages(argument,results,count)
     else:
         return package_list(argument,results,count)
 
@@ -75,6 +83,12 @@ def package_list(argument,results,count):
     response = "{} Resultados:\n".format(count) if count>1 else "{} Resultado:\n".format(count)
     for x in results:
       response += x + "\n"
+    return response
+
+def too_many_packages(argument,results,count):
+    response = "{} Resultados:\nAlgunos de estos son:\n".format(count)
+    for x in range(MAX_PACKAGE_RETURN):
+      response += random.choice(results) + "\n"
     return response
 
 if __name__=="__main__":
