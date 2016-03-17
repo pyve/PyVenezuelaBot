@@ -72,6 +72,8 @@ def get_message(message, info):
     '''
     Just formating the output.
     '''
+    if isinstance(info, str):
+        return info
     name = info.get('name') or ''
     return '''*{name} {version}*
 _{user}_
