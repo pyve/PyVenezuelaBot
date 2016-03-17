@@ -6,13 +6,16 @@ import re
 
 MAX_PACKAGE_RETURN = 50
 pypi_base_url = "https://pypi.python.org/pypi/"
-bot = telebot.TeleBot("148844762:AAEYUrHETWR61EV7cysP6vssnZrhwETi4_8")
-f = open("simple.html")
-h = fromstring(f.read())
-sel = CSSSelector("a")
-packages = []
-for e in sel(h):
-    packages.append(e.get("href"))
+
+with open("token.txt") as t:
+    bot = telebot.TeleBot(t.readline().replace('\n', ''))
+
+with open("simple.html") as f:
+    h = fromstring(f.read())
+    sel = CSSSelector("a")
+    packages = []
+    for e in sel(h):
+        packages.append(e.get("href"))
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -28,18 +31,25 @@ def send_help(message):
 
 @bot.message_handler(commands=['pypi'])
 def pypi(message):
-    if message.text == "/pypi" or message.text == "/pypi ":
-      return    
-    bot.reply_to(message,locate_or_list(message.text[6:]))
+    argument = get_arg(message.text)
+    if argument == '' or argument == None:
+        return
+    bot.reply_to(message,locate_or_list(argument))
 
 @bot.message_handler(commands=['pysearch'])
 def pysearch(message):
-    if message.text == "/pysearch" or message.text == "/pysearch ":
+    argument = get_arg(message.text)
+    if argument == '' or argument == None:
         return
-    response = list_packages(message.text[10:])
+    response = list_packages(argument)
     splitted_text = util.split_string(response, 3000)
     for text in splitted_text:
         bot.reply_to(message,text)
+
+def get_arg(argument):
+    regexp = re.compile("\/\w*(@\w*)*\s*([\s\S]*)",re.IGNORECASE)
+    textmatch = regexp.match(argument)
+    return textmatch.group(2)
 
 def list_packages(argument):
     count = 0
