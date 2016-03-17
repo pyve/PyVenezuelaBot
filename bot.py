@@ -68,12 +68,37 @@ def send_help(message):
         "para busqueda de paquete\n/about sobre este bot")
 
 
+def get_message(message, info):
+    '''
+    Just formating the output.
+    '''
+    name = info.get('name') or ''
+    return '''*{name} {version}*
+_{user}_
+
+{summary}
+
+\xE2\xAC\x85 [Visit the Homepage]({home_page}) or...
+\xE2\x98\x9D [Go to PyPi Site]({package_url})
+'''.format(name=name,
+           user=message.from_user and 'via: @' + str(message.from_user.username) or '',
+           summary=info.get('summary') or '',
+           version=info.get('version') or '',
+           package_url=info.get('package_url') or '',
+           home_page=info.get('home_page') or '')
+
 @bot.message_handler(commands=['pypi'])
 def pypi(message):
     argument = get_arg(message.text)
     if argument == '' or argument is None:
         return
-    bot.reply_to(message, locate_or_list(argument))
+    info = locate_or_list(argument)
+    if not info.get('name'):
+        bot.reply_to(message, 'Sorry not found')
+        return
+    bot.send_message(message.chat.id, get_message(message, info),
+                     parse_mode='Markdown',
+                     disable_web_page_preview=True)
 
 
 @bot.message_handler(commands=['pysearch'])
@@ -131,13 +156,11 @@ def package_located(argument):
     info = {}
     info['url'] = str(pypi_base_url + argument)
     # Using https://wiki.python.org/moin/PyPIXmlRpc
-    pkg_info = xmlrpclib.ServerProxy(pypi_base_url)
+    pkg_info = xmlrpclib.ServerProxy(pypi_base_url, allow_none=True)
     rel = pkg_info.package_releases(argument)
-    info['lastest_rel'] = rel[0]
+    info['lastest_rel'] = rel and rel[0] or None
     pkg_data = pkg_info.release_data(argument, info['lastest_rel'])
-    info['name'] = pkg_data['name']
-    info['summary'] = pkg_data['summary']
-    return info
+    return pkg_data
 
 
 def package_not_found(argument):
@@ -170,7 +193,7 @@ def serve(debug, stop_after_init):
         # TODO: reemplazar por un mejor entorno
         # unittest y setup.py
         exit()
-    bot.polling()
+    bot.polling(none_stop=True)
 
 if __name__ == "__main__":
     serve()
