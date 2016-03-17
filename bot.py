@@ -72,6 +72,10 @@ def get_message(message, info):
     '''
     Just formating the output.
     '''
+    def cleanify(message):
+        user = message.from_user and \
+            'via: @' + str(message.from_user.username) or 'No User'
+        return user.replace('_', ' ')
     if isinstance(info, str):
         return info
     name = info.get('name') or ''
@@ -83,15 +87,17 @@ _{user}_
 \xE2\xAC\x85 [Visit the Homepage]({home_page}) or...
 \xE2\x98\x9D [Go to PyPi Site]({package_url})
 '''.format(name=name,
-           user=message.from_user and 'via: @' + str(message.from_user.username) or '',
+           user=cleanify(message),
            summary=info.get('summary') or '',
            version=info.get('version') or '',
            package_url=info.get('package_url') or '',
            home_page=info.get('home_page') or '')
 
+
 def get_search_msg(info):
     return '''*No encontre nada con ese nombre* _pero esto se parece_
 {search}'''.format(search=info)
+
 
 @bot.message_handler(commands=['pypi'])
 def pypi(message):
