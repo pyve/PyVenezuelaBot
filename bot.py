@@ -14,6 +14,7 @@ import re
 import os
 import click
 import logging
+import xmlrpclib
 
 logger = telebot.logger
 
@@ -127,7 +128,16 @@ def locate_or_list(argument):
 
 
 def package_located(argument):
-    return pypi_base_url + argument
+    info = {}
+    info['url'] = str(pypi_base_url + argument)
+    # Using https://wiki.python.org/moin/PyPIXmlRpc
+    pkg_info = xmlrpclib.ServerProxy(pypi_base_url)
+    rel = pkg_info.package_releases(argument)
+    info['lastest_rel'] = rel[0]
+    pkg_data = pkg_info.release_data(argument, info['lastest_rel'])
+    info['name'] = pkg_data['name']
+    info['summary'] = pkg_data['summary']
+    return info
 
 
 def package_not_found(argument):
