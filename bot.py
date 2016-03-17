@@ -12,9 +12,14 @@ from lxml.etree import fromstring
 from lxml.cssselect import CSSSelector
 import re
 import os
+import click
+import logging
+
+logger = telebot.logger
 
 MAX_PACKAGE_RETURN = 50
 pypi_base_url = "https://pypi.python.org/pypi/"
+
 
 def get_token():
     if os.path.isfile("token.txt"):
@@ -23,6 +28,7 @@ def get_token():
     else:
         token = os.environ.get('TELEGRAM_TOKEN')
     return token
+
 
 def get_bot(token):
     return telebot.TeleBot(token)
@@ -142,5 +148,19 @@ def too_many_packages(argument, results, count):
         response += random.choice(results) + "\n"
     return response
 
-if __name__ == "__main__":
+
+@click.command()
+@click.option('--debug', is_flag=True)
+@click.option('--stop-after-init', is_flag=True)
+def serve(debug, stop_after_init):
+    if debug:
+        telebot.logger.setLevel(logging.DEBUG)
+    if stop_after_init:
+        # Solo para efectos de prueba:
+        # TODO: reemplazar por un mejor entorno
+        # unittest y setup.py
+        exit()
     bot.polling()
+
+if __name__ == "__main__":
+    serve()
