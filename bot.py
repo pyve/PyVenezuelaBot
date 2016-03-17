@@ -89,14 +89,22 @@ _{user}_
            package_url=info.get('package_url') or '',
            home_page=info.get('home_page') or '')
 
+def get_search_msg(info):
+    return '''*No encontre nada con ese nombre* _pero esto se parece_
+{search}'''.format(search=info)
+
 @bot.message_handler(commands=['pypi'])
 def pypi(message):
     argument = get_arg(message.text)
     if argument == '' or argument is None:
         return
     info = locate_or_list(argument)
+    if not isinstance(info, dict):
+        bot.reply_to(message, get_search_msg(info),
+                     parse_mode='Markdown')
+        return
     if not info.get('name'):
-        bot.reply_to(message, 'Sorry not found')
+        bot.reply_to(message, 'Sorry not found: %s' % info)
         return
     bot.send_message(message.chat.id, get_message(message, info),
                      parse_mode='Markdown',
