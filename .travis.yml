@@ -25,10 +25,10 @@ env:
   global:
     - OTRA=PTRAA
   matrix:
-    - TELEGRAM_TOKEN=HOLAMUNDOTODOMAKEENCRYPTED
+    - DEPLOY=X
 
 script:
-  - ./bot.py --stop-after-init
+  - ./bot.py
 
 after_success:
   - echo "I finished fine"

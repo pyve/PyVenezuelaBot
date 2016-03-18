@@ -28,7 +28,11 @@ def get_token():
             token = t.readline().replace('\n', '')
     else:
         token = os.environ.get('TELEGRAM_TOKEN')
-    return token
+    if token:
+        return token
+    else:
+        click.echo('Simply running and diying')
+        exit()
 
 
 def get_bot(token):
