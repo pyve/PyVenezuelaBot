@@ -21,8 +21,14 @@ install:
   - sed -i '/lxml/d' requirements.txt
   - pip install -r requirements.txt
 
+env:
+  global:
+    - OTRA=PTRAA
+  matrix:
+    - DEPLOY=X
+
 script:
-  - ./bot.py --stop-after-init
+  - ./bot.py
 
 after_success:
   - echo "I finished fine"

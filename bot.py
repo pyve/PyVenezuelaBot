@@ -28,7 +28,11 @@ def get_token():
             token = t.readline().replace('\n', '')
     else:
         token = os.environ.get('TELEGRAM_TOKEN')
-    return token
+    if token:
+        return token
+    else:
+        click.echo('Simply running and diying')
+        exit()
 
 
 def get_bot(token):
@@ -71,9 +75,10 @@ def send_help(message):
 def get_message(message, info):
     '''
     Just formating the output.
+    TODO: Esto deberia venir de un jinja para no meter parseo de texto aquí.
     '''
     def cleanify(message):
-        user = message.from_user and \
+        user = message.from_user.username and \
             'via: @' + str(message.from_user.username) or 'No User'
         return user.replace('_', ' ')
     if isinstance(info, str):
